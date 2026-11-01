@@ -1,18 +1,16 @@
 import "dotenv/config";
 import express from "express";
+import { fileURLToPath } from "node:url";
 import { conectarDB } from "./config/db.js";
 import autoresRoutes from "./routes/autores.routes.js";
 import comicsRoutes from "./routes/comics.routes.js";
 
 const app = express();
+const frontendPath = fileURLToPath(new URL("../../Frontend/", import.meta.url));
 
 // Middleware: permite leer el cuerpo de las peticiones en formato JSON
 app.use(express.json());
-
-// Ruta de prueba
-app.get("/", (req, res) => {
-  res.json({ mensaje: "API de la Tienda de Cómics funcionando" });
-});
+app.use(express.static(frontendPath));
 
 // Rutas de la API
 app.use("/api/autores", autoresRoutes);
@@ -27,7 +25,7 @@ const PORT = process.env.PORT || 3000;
 
 // Primero conectamos a la base de datos y luego levantamos el servidor
 conectarDB().then(() => {
-  app.listen(PORT, () => {
+  app.listen(PORT, "0.0.0.0", () => {
     console.log(`Servidor escuchando en http://localhost:${PORT}`);
   });
 });
